@@ -1,0 +1,455 @@
+const weddingDate = new Date("2026-08-28T16:40:00+03:00");
+
+const app = document.getElementById("inviteApp");
+const slides = Array.from(document.querySelectorAll(".slide"));
+const dots = document.getElementById("slideDots");
+
+let currentSlide = 0;
+let isLocked = false;
+let touchStartY = 0;
+let touchStartX = 0;
+
+function createDots() {
+  slides.forEach((slide, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.setAttribute("aria-label", `Перейти к слайду ${index + 1}`);
+    dot.addEventListener("click", () => goToSlide(index));
+    dots.appendChild(dot);
+  });
+}
+
+function updateSlideState() {
+  slides.forEach((slide, index) => {
+    const isActive = index === currentSlide;
+    slide.classList.toggle("is-active", isActive);
+    slide.classList.toggle("is-prev", index === currentSlide - 1);
+    slide.classList.toggle("is-next", index === currentSlide + 1);
+    slide.classList.toggle("is-before", index < currentSlide - 1);
+    slide.classList.toggle("is-after", index > currentSlide + 1);
+    slide.setAttribute("aria-hidden", String(!isActive));
+  });
+
+  Array.from(dots.children).forEach((dot, index) => {
+    dot.classList.toggle("is-active", index === currentSlide);
+    dot.setAttribute("aria-current", index === currentSlide ? "true" : "false");
+  });
+}
+
+function goToSlide(index) {
+  const nextIndex = Math.max(0, Math.min(index, slides.length - 1));
+
+  if (nextIndex === currentSlide || isLocked) {
+    return;
+  }
+
+  const directionClass = nextIndex > currentSlide ? "is-turning-down" : "is-turning-up";
+  app.classList.remove("is-turning-down", "is-turning-up");
+  app.classList.add("is-turning", directionClass);
+  currentSlide = nextIndex;
+  updateSlideState();
+
+  isLocked = true;
+  window.setTimeout(() => {
+    isLocked = false;
+    app.classList.remove("is-turning", "is-turning-down", "is-turning-up");
+  }, 1050);
+}
+
+function goNext() {
+  goToSlide(currentSlide + 1);
+}
+
+function goPrev() {
+  goToSlide(currentSlide - 1);
+}
+
+function setupSliderControls() {
+  document.querySelectorAll("[data-next]").forEach((button) => {
+    button.addEventListener("click", goNext);
+  });
+
+  app.addEventListener(
+    "wheel",
+    (event) => {
+      event.preventDefault();
+
+      if (Math.abs(event.deltaY) < 14) {
+        return;
+      }
+
+      if (event.deltaY > 0) {
+        goNext();
+      } else {
+        goPrev();
+      }
+    },
+    { passive: false },
+  );
+
+  app.addEventListener(
+    "touchstart",
+    (event) => {
+      const touch = event.changedTouches[0];
+      touchStartY = touch.clientY;
+      touchStartX = touch.clientX;
+    },
+    { passive: true },
+  );
+
+  app.addEventListener(
+    "touchmove",
+    (event) => {
+      event.preventDefault();
+    },
+    { passive: false },
+  );
+
+  app.addEventListener(
+    "touchend",
+    (event) => {
+      const touch = event.changedTouches[0];
+      const deltaY = touchStartY - touch.clientY;
+      const deltaX = touchStartX - touch.clientX;
+
+      if (Math.abs(deltaY) < 48 || Math.abs(deltaY) < Math.abs(deltaX)) {
+        return;
+      }
+
+      if (deltaY > 0) {
+        goNext();
+      } else {
+        goPrev();
+      }
+    },
+    { passive: true },
+  );
+
+  window.addEventListener("keydown", (event) => {
+    if (["ArrowDown", "PageDown", " "].includes(event.key)) {
+      event.preventDefault();
+      goNext();
+    }
+
+    if (["ArrowUp", "PageUp"].includes(event.key)) {
+      event.preventDefault();
+      goPrev();
+    }
+  });
+}
+
+function setupPerspectiveTilt() {
+  app.addEventListener("pointermove", (event) => {
+    if (event.pointerType !== "mouse") {
+      return;
+    }
+
+    const rect = app.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+
+    app.style.setProperty("--tilt-x", `${(-y * 2.8).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-y", `${(x * 3.6).toFixed(2)}deg`);
+  });
+
+  app.addEventListener("pointerleave", () => {
+    app.style.setProperty("--tilt-x", "0deg");
+    app.style.setProperty("--tilt-y", "0deg");
+  });
+}
+
+function padNumber(value) {
+  return String(value).padStart(2, "0");
+}
+
+function updateCountdown() {
+  const diff = weddingDate.getTime() - Date.now();
+  const dayMessage = document.getElementById("dayMessage");
+
+  if (diff <= 0) {
+    setTimerValue("days", "0");
+    setTimerValue("hours", "00");
+    setTimerValue("minutes", "00");
+    setTimerValue("seconds", "00");
+    dayMessage.hidden = false;
+    return;
+  }
+
+  const secondsTotal = Math.floor(diff / 1000);
+  const days = Math.floor(secondsTotal / 86400);
+  const hours = Math.floor((secondsTotal % 86400) / 3600);
+  const minutes = Math.floor((secondsTotal % 3600) / 60);
+  const seconds = secondsTotal % 60;
+
+  setTimerValue("days", days);
+  setTimerValue("hours", padNumber(hours));
+  setTimerValue("minutes", padNumber(minutes));
+  setTimerValue("seconds", padNumber(seconds));
+  dayMessage.hidden = true;
+}
+
+function setTimerValue(name, value) {
+  const element = document.querySelector(`[data-time="${name}"]`);
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+const storySteps = [
+  {
+    image: "images/story-13.jpg",
+    title: "Глава 1",
+    text: "В этой истории уже есть главный кадр: мы рядом, улыбаемся и точно знаем, что дальше пойдём вместе.",
+    alt: "Алексей и Лияна на праздничном фото",
+  },
+  {
+    image: "images/story-01.jpg",
+    title: "Глава 2",
+    text: "Но когда-то каждый из нас шёл своей дорогой, собирал воспоминания, характер и свои маленькие победы.",
+    alt: "Алексей на солнечном отдыхе",
+  },
+  {
+    image: "images/story-06.jpg",
+    title: "Глава 3",
+    text: "Лияна тоже шла своим путём: с ветром, морем, характером и внутренним светом.",
+    alt: "Лияна у моря",
+  },
+  {
+    image: "images/story-02.jpg",
+    title: "Глава 4",
+    text: "Алексей всегда умел двигаться вперёд. Даже когда дистанция большая, а финиш ещё далеко.",
+    alt: "Алексей на забеге",
+  },
+  {
+    image: "images/story-08.jpg",
+    title: "Глава 5",
+    text: "Лияна умела появляться там, где сразу становилось ярче, легче и веселее.",
+    alt: "Лияна на празднике спорта",
+  },
+  {
+    image: "images/story-03.jpg",
+    title: "Глава 6",
+    text: "Были испытания, новые старты, дороги, которые проверяли силу и терпение.",
+    alt: "Алексей на гонке героев",
+  },
+  {
+    image: "images/story-09.jpg",
+    title: "Глава 7",
+    text: "Были путешествия, солнце, красивые места и кадры, которые хочется пересматривать.",
+    alt: "Лияна в путешествии",
+  },
+  {
+    image: "images/story-04.jpg",
+    title: "Глава 8",
+    text: "Даже зима не мешала радоваться победам. Иногда счастье выглядит как медаль и красная форма.",
+    alt: "Алексей с медалью",
+  },
+  {
+    image: "images/story-07.jpg",
+    title: "Глава 9",
+    text: "Иногда история будто ждала подходящей сцены, света и момента, чтобы всё красиво началось.",
+    alt: "Лияна в интерьере",
+  },
+  {
+    image: "images/story-05.jpg",
+    title: "Глава 10",
+    text: "Потом в кадрах стало больше домашнего тепла, заботы и тех самых деталей, из которых строится близость.",
+    alt: "Алексей с собакой",
+  },
+  {
+    image: "images/story-11.jpg",
+    title: "Глава 11",
+    text: "Появились общие маленькие радости, смешные прогулки и ощущение: рядом спокойно.",
+    alt: "Лияна с собакой",
+  },
+  {
+    image: "images/story-10.jpg",
+    title: "Глава 12",
+    text: "Были моменты, где можно просто быть собой: немного смешными, настоящими и очень живыми.",
+    alt: "Лияна рядом с настенным рисунком",
+  },
+  {
+    image: "images/story-12.jpg",
+    title: "Глава 13",
+    text: "Были дороги повыше, виды пошире и чувство, что впереди ещё столько общего.",
+    alt: "Лияна в горах",
+  },
+  {
+    image: "images/story-15.jpg",
+    title: "Глава 14",
+    text: "Были яркие впечатления, огонь, смех и приключения, которые становятся семейными легендами.",
+    alt: "Лияна на фоне огненного шоу",
+  },
+  {
+    image: "images/story-14.jpg",
+    title: "Глава 15",
+    text: "А теперь мы выбираем быть рядом не только в кадре. Мы выбираем стать семьёй.",
+    alt: "Алексей и Лияна вместе",
+  },
+];
+
+let storyIndex = 0;
+
+function setupStory() {
+  const storyAlbum = document.querySelector(".story-album");
+  const storyImage = document.getElementById("storyImage");
+  const storyKicker = document.getElementById("storyKicker");
+  const storyCounter = document.getElementById("storyCounter");
+  const storyText = document.getElementById("storyText");
+  const storyButton = document.getElementById("storyButton");
+  const storyContinueButton = document.getElementById("storyContinueButton");
+  const storyProgress = document.getElementById("storyProgress");
+
+  storySteps.forEach((step, index) => {
+    const preload = new Image();
+    preload.src = step.image;
+
+    const dot = document.createElement("span");
+    dot.classList.toggle("is-active", index === 0);
+    storyProgress.appendChild(dot);
+  });
+
+  function renderStoryStep(withMotion = true) {
+    const step = storySteps[storyIndex];
+
+    if (!withMotion) {
+      storyImage.src = step.image;
+      storyImage.alt = step.alt;
+      storyKicker.textContent = step.title;
+      storyText.textContent = step.text;
+      storyCounter.textContent = `${padNumber(storyIndex + 1)} / ${storySteps.length}`;
+      updateStoryControls();
+      return;
+    }
+
+    storyAlbum.classList.add("is-changing");
+    storyText.style.opacity = "0";
+    storyText.style.transform = "translateY(8px)";
+    storyKicker.style.opacity = "0";
+
+    window.setTimeout(() => {
+      storyImage.src = step.image;
+      storyImage.alt = step.alt;
+      storyKicker.textContent = step.title;
+      storyText.textContent = step.text;
+      storyCounter.textContent = `${padNumber(storyIndex + 1)} / ${storySteps.length}`;
+      storyText.style.opacity = "1";
+      storyText.style.transform = "translateY(0)";
+      storyKicker.style.opacity = "1";
+      storyAlbum.classList.remove("is-changing");
+      updateStoryControls();
+    }, 220);
+  }
+
+  function updateStoryControls() {
+    const isLastStep = storyIndex === storySteps.length - 1;
+    storyButton.textContent = isLastStep ? "Сначала" : "Следующий кадр";
+    storyContinueButton.hidden = !isLastStep;
+
+    Array.from(storyProgress.children).forEach((dot, index) => {
+      dot.classList.toggle("is-active", index === storyIndex);
+    });
+  }
+
+  storyButton.addEventListener("click", () => {
+    storyIndex = (storyIndex + 1) % storySteps.length;
+    renderStoryStep();
+  });
+
+  storyContinueButton.addEventListener("click", goNext);
+
+  renderStoryStep(false);
+}
+
+function setupCalendarButton() {
+  const calendarButton = document.getElementById("calendarButton");
+
+  if (!calendarButton) {
+    return;
+  }
+
+  calendarButton.addEventListener("click", () => {
+    const eventTitle = "Свадьба Алексея и Лияны";
+    const eventLocation =
+      "Городской дворец бракосочетания, ул. Советская, 47, Тула, Тульская обл.";
+    const eventDescription =
+      "Свадебная роспись Алексея и Лияны. Будущая семья Кульпины.";
+    const calendarContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Kulpiny Wedding Invitation//RU",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:kulpiny-wedding-20260828T164000@invitation.local",
+      "DTSTAMP:20260621T000000Z",
+      "DTSTART;TZID=Europe/Moscow:20260828T164000",
+      "DTEND;TZID=Europe/Moscow:20260828T174000",
+      `SUMMARY:${escapeCalendarText(eventTitle)}`,
+      `LOCATION:${escapeCalendarText(eventLocation)}`,
+      `DESCRIPTION:${escapeCalendarText(eventDescription)}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([calendarContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "wedding-alexey-liyana.ics";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+}
+
+function escapeCalendarText(value) {
+  return String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function setupRsvpForm() {
+  const form = document.getElementById("rsvpForm");
+  const message = document.getElementById("formMessage");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const payload = {
+      guestName: formData.get("guestName"),
+      attendance: formData.get("attendance"),
+      comment: formData.get("comment"),
+      submittedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("wedding-rsvp", JSON.stringify(payload));
+    await sendGuestReply(payload);
+
+    message.textContent = "Спасибо! Ваш ответ сохранён.";
+    form.reset();
+    form.querySelector('input[name="attendance"][value="Приду"]').checked = true;
+  });
+}
+
+async function sendGuestReply(payload) {
+  // Здесь позже можно подключить Telegram-бота, Google Таблицу или Битрикс24.
+  // Например: return fetch("ВАШ_WEBHOOK_URL", { method: "POST", body: JSON.stringify(payload) });
+  return payload;
+}
+
+createDots();
+setupSliderControls();
+setupPerspectiveTilt();
+setupStory();
+setupCalendarButton();
+setupRsvpForm();
+updateSlideState();
+updateCountdown();
+window.setInterval(updateCountdown, 1000);

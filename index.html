@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Свадебное приглашение | Алексей & Лияна</title>
+    <meta
+      name="description"
+      content="Свадебное приглашение Алексея и Лияны. 28 августа 2026, 16:40, Тула."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="invite-shell" id="inviteApp" aria-label="Свадебное приглашение Алексея и Лияны">
+      <div class="slides" id="slides">
+        <section class="slide slide--hero is-active" aria-label="Главный экран">
+          <div class="slide-bg slide-bg--couple-main"></div>
+          <div class="petals" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="slide__inner slide__inner--center">
+            <p class="eyebrow">Свадебное приглашение</p>
+            <h1>Алексей &amp; Лияна</h1>
+            <div class="date-stack" aria-label="Дата и время свадьбы">
+              <span>28 августа 2026</span>
+              <small>16:40</small>
+            </div>
+            <button class="btn btn--primary" type="button" data-next>Открыть приглашение</button>
+          </div>
+          <p class="swipe-hint">Листайте вверх</p>
+        </section>
+
+        <section class="slide slide--countdown" aria-label="Обратный отсчёт">
+          <div class="slide__inner slide__inner--center">
+            <p class="eyebrow">28 августа 2026</p>
+            <h2>До нашей свадьбы осталось</h2>
+            <div class="timer" id="timer" aria-live="polite">
+              <div class="timer__item">
+                <strong data-time="days">0</strong>
+                <span>дней</span>
+              </div>
+              <div class="timer__item">
+                <strong data-time="hours">0</strong>
+                <span>часов</span>
+              </div>
+              <div class="timer__item">
+                <strong data-time="minutes">0</strong>
+                <span>минут</span>
+              </div>
+              <div class="timer__item">
+                <strong data-time="seconds">0</strong>
+                <span>секунд</span>
+              </div>
+            </div>
+            <p class="text">
+              Этот день становится всё ближе. И нам очень хочется, чтобы вы были рядом.
+            </p>
+            <button class="btn btn--soft calendar-button" type="button" id="calendarButton">
+              Добавить в календарь
+            </button>
+            <p class="day-message" id="dayMessage" hidden>Сегодня наш день!</p>
+          </div>
+        </section>
+
+        <section class="slide slide--place-photo" aria-label="Фасад дворца бракосочетания">
+          <div class="slide__inner">
+            <figure class="photo-panel photo-panel--zags">
+              <figcaption>Здесь начнётся наша семейная история</figcaption>
+            </figure>
+            <div class="place-copy">
+              <p class="eyebrow">Место росписи</p>
+              <h2>Городской дворец бракосочетания</h2>
+              <p class="address">Тула, ул. Советская, 47</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide slide--story" aria-label="История пары">
+          <div class="slide__inner slide__inner--center">
+            <p class="eyebrow">Алексей и Лияна</p>
+            <h2>Наша история</h2>
+            <div class="story-album" aria-live="polite">
+              <div class="story-photo-frame">
+                <img
+                  id="storyImage"
+                  src="images/story-13.jpg"
+                  alt="Фото из истории Алексея и Лияны"
+                />
+                <span class="story-counter" id="storyCounter">01 / 15</span>
+              </div>
+              <div class="story-box">
+                <p class="story-kicker" id="storyKicker">Глава 1</p>
+                <p id="storyText">
+                  В этой истории уже есть главный кадр: мы рядом, улыбаемся и точно
+                  знаем, что дальше пойдём вместе.
+                </p>
+                <div class="story-progress" id="storyProgress" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div class="story-actions">
+              <button class="btn btn--soft" type="button" id="storyButton">Следующий кадр</button>
+              <button class="btn btn--primary" type="button" id="storyContinueButton" hidden>
+                Продолжить
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide slide--details" aria-label="Когда и где">
+          <div class="slide__inner slide__inner--center">
+            <p class="eyebrow">Приглашаем</p>
+            <h2>Ждём вас</h2>
+            <div class="details-list">
+              <div class="detail-line">
+                <span>Дата и время</span>
+                <strong>28 августа 2026 · 16:40</strong>
+              </div>
+              <div class="detail-line">
+                <span>Место</span>
+                <strong>Городской дворец бракосочетания</strong>
+              </div>
+              <div class="detail-line">
+                <span>Адрес</span>
+                <strong>ул. Советская, 47, Тула</strong>
+              </div>
+            </div>
+            <a
+              class="btn btn--primary"
+              href="https://yandex.ru/maps/?text=%D0%A2%D1%83%D0%BB%D0%B0%2C%20%D0%A1%D0%BE%D0%B2%D0%B5%D1%82%D1%81%D0%BA%D0%B0%D1%8F%2047%2C%20%D0%93%D0%BE%D1%80%D0%BE%D0%B4%D1%81%D0%BA%D0%BE%D0%B9%20%D0%B4%D0%B2%D0%BE%D1%80%D0%B5%D1%86%20%D0%B1%D1%80%D0%B0%D0%BA%D0%BE%D1%81%D0%BE%D1%87%D0%B5%D1%82%D0%B0%D0%BD%D0%B8%D1%8F"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Открыть в Яндекс.Картах
+            </a>
+          </div>
+        </section>
+
+        <section class="slide slide--rsvp" aria-label="Ответ гостя">
+          <div class="slide__inner">
+            <p class="eyebrow">Ответ гостя</p>
+            <h2>Вы будете с нами?</h2>
+            <form class="rsvp-form" id="rsvpForm">
+              <label class="field">
+                <span>Имя гостя</span>
+                <input type="text" name="guestName" autocomplete="name" required />
+              </label>
+
+              <fieldset class="field radio-field">
+                <legend>Ваш ответ</legend>
+                <label>
+                  <input type="radio" name="attendance" value="Приду" checked />
+                  <span>Приду</span>
+                </label>
+                <label>
+                  <input type="radio" name="attendance" value="Не смогу" />
+                  <span>Не смогу</span>
+                </label>
+              </fieldset>
+
+              <label class="field">
+                <span>Комментарий</span>
+                <textarea name="comment" rows="3"></textarea>
+              </label>
+
+              <button class="btn btn--primary" type="submit">Отправить ответ</button>
+              <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </section>
+
+        <section class="slide slide--final" aria-label="Финальный экран">
+          <div class="slide-bg slide-bg--couple-second"></div>
+          <div class="slide__inner slide__inner--center">
+            <p class="eyebrow">28 августа 2026</p>
+            <h2>С любовью, семья Кульпины</h2>
+            <p class="text">Спасибо, что вы рядом с нами в этот важный день.</p>
+          </div>
+        </section>
+      </div>
+
+      <nav class="slide-dots" id="slideDots" aria-label="Навигация по слайдам"></nav>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
