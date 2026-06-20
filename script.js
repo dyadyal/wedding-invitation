@@ -198,90 +198,105 @@ function setTimerValue(name, value) {
 const storySteps = [
   {
     image: "images/story-13.jpg",
+    position: "50% 48%",
     title: "Глава 1",
     text: "В этой истории уже есть главный кадр: мы рядом, улыбаемся и точно знаем, что дальше пойдём вместе.",
     alt: "Алексей и Лияна на праздничном фото",
   },
   {
     image: "images/story-01.jpg",
+    position: "50% 34%",
     title: "Глава 2",
     text: "Но когда-то каждый из нас шёл своей дорогой, собирал воспоминания, характер и свои маленькие победы.",
     alt: "Алексей на солнечном отдыхе",
   },
   {
     image: "images/story-06.jpg",
+    position: "50% 42%",
     title: "Глава 3",
     text: "Лияна тоже шла своим путём: с ветром, морем, характером и внутренним светом.",
     alt: "Лияна у моря",
   },
   {
     image: "images/story-02.jpg",
+    position: "50% 30%",
     title: "Глава 4",
     text: "Алексей всегда умел двигаться вперёд. Даже когда дистанция большая, а финиш ещё далеко.",
     alt: "Алексей на забеге",
   },
   {
     image: "images/story-08.jpg",
+    position: "50% 44%",
     title: "Глава 5",
     text: "Лияна умела появляться там, где сразу становилось ярче, легче и веселее.",
     alt: "Лияна на празднике спорта",
   },
   {
     image: "images/story-03.jpg",
+    position: "50% 39%",
     title: "Глава 6",
     text: "Были испытания, новые старты, дороги, которые проверяли силу и терпение.",
     alt: "Алексей на гонке героев",
   },
   {
     image: "images/story-09.jpg",
+    position: "50% 43%",
     title: "Глава 7",
     text: "Были путешествия, солнце, красивые места и кадры, которые хочется пересматривать.",
     alt: "Лияна в путешествии",
   },
   {
     image: "images/story-04.jpg",
+    position: "50% 31%",
     title: "Глава 8",
     text: "Даже зима не мешала радоваться победам. Иногда счастье выглядит как медаль и красная форма.",
     alt: "Алексей с медалью",
   },
   {
     image: "images/story-07.jpg",
+    position: "50% 45%",
     title: "Глава 9",
     text: "Иногда история будто ждала подходящей сцены, света и момента, чтобы всё красиво началось.",
     alt: "Лияна в интерьере",
   },
   {
     image: "images/story-05.jpg",
+    position: "58% 4%",
     title: "Глава 10",
     text: "Потом в кадрах стало больше домашнего тепла, заботы и тех самых деталей, из которых строится близость.",
     alt: "Алексей с собакой",
   },
   {
     image: "images/story-11.jpg",
+    position: "48% 36%",
     title: "Глава 11",
     text: "Появились общие маленькие радости, смешные прогулки и ощущение: рядом спокойно.",
     alt: "Лияна с собакой",
   },
   {
     image: "images/story-10.jpg",
+    position: "44% 43%",
     title: "Глава 12",
     text: "Были моменты, где можно просто быть собой: немного смешными, настоящими и очень живыми.",
     alt: "Лияна рядом с настенным рисунком",
   },
   {
     image: "images/story-12.jpg",
+    position: "50% 44%",
     title: "Глава 13",
     text: "Были дороги повыше, виды пошире и чувство, что впереди ещё столько общего.",
     alt: "Лияна в горах",
   },
   {
     image: "images/story-15.jpg",
+    position: "58% 48%",
     title: "Глава 14",
     text: "Были яркие впечатления, огонь, смех и приключения, которые становятся семейными легендами.",
     alt: "Лияна на фоне огненного шоу",
   },
   {
     image: "images/story-14.jpg",
+    position: "50% 47%",
     title: "Глава 15",
     text: "А теперь мы выбираем быть рядом не только в кадре. Мы выбираем стать семьёй.",
     alt: "Алексей и Лияна вместе",
@@ -317,6 +332,7 @@ function setupStory() {
       storyImage.src = step.image;
       storyImage.alt = step.alt;
       storyPhotoFrame.style.setProperty("--story-image", `url("${step.image}")`);
+      storyPhotoFrame.style.setProperty("--story-position", step.position);
       storyKicker.textContent = step.title;
       storyText.textContent = step.text;
       storyCounter.textContent = `${padNumber(storyIndex + 1)} / ${storySteps.length}`;
@@ -333,6 +349,7 @@ function setupStory() {
       storyImage.src = step.image;
       storyImage.alt = step.alt;
       storyPhotoFrame.style.setProperty("--story-image", `url("${step.image}")`);
+      storyPhotoFrame.style.setProperty("--story-position", step.position);
       storyKicker.textContent = step.title;
       storyText.textContent = step.text;
       storyCounter.textContent = `${padNumber(storyIndex + 1)} / ${storySteps.length}`;
