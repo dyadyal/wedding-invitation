@@ -611,12 +611,84 @@ async function sendGuestReply(payload) {
   return payload;
 }
 
+function setupBackgroundMusic() {
+  const music = document.getElementById("bgMusic");
+  const toggle = document.getElementById("musicToggle");
+
+  if (!music || !toggle) {
+    return;
+  }
+
+  let userPaused = false;
+  let isTryingToPlay = false;
+
+  music.volume = 0.42;
+
+  function updateMusicButton() {
+    const isPlaying = !music.paused && !music.muted;
+
+    toggle.classList.toggle("is-playing", isPlaying);
+    toggle.setAttribute("aria-pressed", String(isPlaying));
+    toggle.setAttribute("aria-label", isPlaying ? "Выключить музыку" : "Включить музыку");
+  }
+
+  async function playMusic() {
+    if (isTryingToPlay || userPaused) {
+      return;
+    }
+
+    isTryingToPlay = true;
+    music.muted = false;
+
+    try {
+      await music.play();
+    } catch (error) {
+      updateMusicButton();
+    } finally {
+      isTryingToPlay = false;
+      updateMusicButton();
+    }
+  }
+
+  function pauseMusic() {
+    userPaused = true;
+    music.pause();
+    updateMusicButton();
+  }
+
+  function unlockMusic() {
+    playMusic();
+  }
+
+  toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    if (music.paused || music.muted) {
+      userPaused = false;
+      playMusic();
+      return;
+    }
+
+    pauseMusic();
+  });
+
+  music.addEventListener("play", updateMusicButton);
+  music.addEventListener("pause", updateMusicButton);
+  music.addEventListener("volumechange", updateMusicButton);
+  document.addEventListener("click", unlockMusic, { capture: true, once: true });
+  document.addEventListener("touchend", unlockMusic, { capture: true, once: true, passive: true });
+
+  window.setTimeout(playMusic, 250);
+  updateMusicButton();
+}
+
 createDots();
 setupSliderControls();
 setupPerspectiveTilt();
 setupStory();
 setupCalendarButton();
 setupRsvpForm();
+setupBackgroundMusic();
 updateSlideState();
 updateCountdown();
 window.setInterval(updateCountdown, 1000);
