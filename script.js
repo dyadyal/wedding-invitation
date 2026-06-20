@@ -158,10 +158,19 @@ function setupPerspectiveTilt() {
   }
 
   function applyTilt(x, y) {
-    app.style.setProperty("--tilt-x", `${(-y * 3.2).toFixed(2)}deg`);
-    app.style.setProperty("--tilt-y", `${(x * 4.4).toFixed(2)}deg`);
-    app.style.setProperty("--tilt-layer-x", `${(x * 8).toFixed(2)}px`);
-    app.style.setProperty("--tilt-layer-y", `${(y * 7).toFixed(2)}px`);
+    app.style.setProperty("--tilt-x", `${(-y * 1.7).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-y", `${(x * 2.2).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-scene-x", `${(-y * 0.85).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-scene-y", `${(x * 1.05).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-card-x", `${(-y * 3.5).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-card-y", `${(x * 4.6).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-layer-x", `${(x * 6).toFixed(2)}px`);
+    app.style.setProperty("--tilt-layer-y", `${(y * 5).toFixed(2)}px`);
+    app.style.setProperty("--tilt-ui-x", `${(x * 2.6).toFixed(2)}px`);
+    app.style.setProperty("--tilt-ui-y", `${(y * 2.2).toFixed(2)}px`);
+    app.style.setProperty("--tilt-ui-z", `${(12 + Math.abs(x) * 8 + Math.abs(y) * 6).toFixed(2)}px`);
+    app.style.setProperty("--tilt-control-x", `${(x * 5).toFixed(2)}px`);
+    app.style.setProperty("--tilt-control-y", `${(y * 4).toFixed(2)}px`);
     app.style.setProperty("--tilt-bg-x", `${(-x * 18).toFixed(2)}px`);
     app.style.setProperty("--tilt-bg-y", `${(-y * 14).toFixed(2)}px`);
     app.style.setProperty("--tilt-photo-x", `${(-x * 12).toFixed(2)}px`);
