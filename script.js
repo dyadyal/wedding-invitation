@@ -139,8 +139,127 @@ function setupSliderControls() {
 }
 
 function setupPerspectiveTilt() {
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const targetTilt = { x: 0, y: 0 };
+  const currentTilt = { x: 0, y: 0 };
+  let animationFrame = 0;
+  let orientationStarted = false;
+  let permissionRequested = false;
+  let baseGamma = null;
+  let baseBeta = null;
+  let lastOrientationAt = 0;
+
+  if (reducedMotion.matches) {
+    return;
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function applyTilt(x, y) {
+    app.style.setProperty("--tilt-x", `${(-y * 3.2).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-y", `${(x * 4.4).toFixed(2)}deg`);
+    app.style.setProperty("--tilt-layer-x", `${(x * 8).toFixed(2)}px`);
+    app.style.setProperty("--tilt-layer-y", `${(y * 7).toFixed(2)}px`);
+    app.style.setProperty("--tilt-bg-x", `${(-x * 18).toFixed(2)}px`);
+    app.style.setProperty("--tilt-bg-y", `${(-y * 14).toFixed(2)}px`);
+    app.style.setProperty("--tilt-photo-x", `${(-x * 12).toFixed(2)}px`);
+    app.style.setProperty("--tilt-photo-y", `${(-y * 10).toFixed(2)}px`);
+    app.style.setProperty("--tilt-grid-x", `${(x * 16).toFixed(2)}px`);
+    app.style.setProperty("--tilt-grid-y", `${(y * 16).toFixed(2)}px`);
+    app.style.setProperty("--tilt-spark-x", `${(x * 24).toFixed(2)}px`);
+    app.style.setProperty("--tilt-glow-x", `${(50 + x * 24).toFixed(2)}%`);
+    app.style.setProperty("--tilt-glow-y", `${(16 + y * 20).toFixed(2)}%`);
+  }
+
+  function animateTilt() {
+    currentTilt.x += (targetTilt.x - currentTilt.x) * 0.14;
+    currentTilt.y += (targetTilt.y - currentTilt.y) * 0.14;
+    applyTilt(currentTilt.x, currentTilt.y);
+
+    if (
+      Math.abs(targetTilt.x - currentTilt.x) > 0.002 ||
+      Math.abs(targetTilt.y - currentTilt.y) > 0.002
+    ) {
+      animationFrame = window.requestAnimationFrame(animateTilt);
+      return;
+    }
+
+    animationFrame = 0;
+  }
+
+  function setTilt(x, y) {
+    targetTilt.x = clamp(x, -1, 1);
+    targetTilt.y = clamp(y, -1, 1);
+
+    if (!animationFrame) {
+      animationFrame = window.requestAnimationFrame(animateTilt);
+    }
+  }
+
+  function resetTilt() {
+    setTilt(0, 0);
+  }
+
+  function handleDeviceOrientation(event) {
+    if (!Number.isFinite(event.gamma) || !Number.isFinite(event.beta)) {
+      return;
+    }
+
+    if (baseGamma === null || baseBeta === null) {
+      baseGamma = event.gamma;
+      baseBeta = event.beta;
+    }
+
+    lastOrientationAt = Date.now();
+    setTilt((event.gamma - baseGamma) / 18, (event.beta - baseBeta) / 22);
+  }
+
+  function connectDeviceTilt() {
+    if (orientationStarted || !("DeviceOrientationEvent" in window)) {
+      return;
+    }
+
+    orientationStarted = true;
+    window.addEventListener("deviceorientation", handleDeviceOrientation, true);
+  }
+
+  async function requestDeviceTilt() {
+    if (!("DeviceOrientationEvent" in window)) {
+      return;
+    }
+
+    const orientationEvent = window.DeviceOrientationEvent;
+
+    if (typeof orientationEvent.requestPermission !== "function") {
+      connectDeviceTilt();
+      return;
+    }
+
+    if (permissionRequested) {
+      return;
+    }
+
+    try {
+      permissionRequested = true;
+      const state = await orientationEvent.requestPermission();
+
+      if (state === "granted") {
+        connectDeviceTilt();
+      }
+    } catch (error) {
+      permissionRequested = false;
+      resetTilt();
+    }
+  }
+
   app.addEventListener("pointermove", (event) => {
     if (event.pointerType !== "mouse") {
+      return;
+    }
+
+    if (Date.now() - lastOrientationAt < 1000) {
       return;
     }
 
@@ -148,14 +267,28 @@ function setupPerspectiveTilt() {
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
 
-    app.style.setProperty("--tilt-x", `${(-y * 2.8).toFixed(2)}deg`);
-    app.style.setProperty("--tilt-y", `${(x * 3.6).toFixed(2)}deg`);
+    setTilt(x * 2, y * 2);
   });
 
-  app.addEventListener("pointerleave", () => {
-    app.style.setProperty("--tilt-x", "0deg");
-    app.style.setProperty("--tilt-y", "0deg");
+  app.addEventListener("pointerleave", resetTilt);
+  window.addEventListener("blur", resetTilt);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      baseGamma = null;
+      baseBeta = null;
+      resetTilt();
+    }
   });
+
+  document.addEventListener("click", requestDeviceTilt, { capture: true, once: true });
+  document.addEventListener("touchend", requestDeviceTilt, { capture: true, once: true, passive: true });
+
+  if (
+    !("DeviceOrientationEvent" in window) ||
+    typeof window.DeviceOrientationEvent.requestPermission !== "function"
+  ) {
+    connectDeviceTilt();
+  }
 }
 
 function padNumber(value) {

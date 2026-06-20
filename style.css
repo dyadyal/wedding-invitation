@@ -64,6 +64,17 @@ a {
   touch-action: none;
   --tilt-x: 0deg;
   --tilt-y: 0deg;
+  --tilt-layer-x: 0px;
+  --tilt-layer-y: 0px;
+  --tilt-bg-x: 0px;
+  --tilt-bg-y: 0px;
+  --tilt-photo-x: 0px;
+  --tilt-photo-y: 0px;
+  --tilt-grid-x: 0px;
+  --tilt-grid-y: 0px;
+  --tilt-spark-x: 0px;
+  --tilt-glow-x: 50%;
+  --tilt-glow-y: 16%;
 }
 
 .invite-shell::before,
@@ -80,9 +91,11 @@ a {
     linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
     linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 38px 38px;
+  background-position: var(--tilt-grid-x) var(--tilt-grid-y);
   mix-blend-mode: screen;
   opacity: 0.32;
   mask-image: radial-gradient(circle at center, #000 0, transparent 78%);
+  transition: background-position 180ms linear;
 }
 
 .invite-shell::after {
@@ -186,8 +199,9 @@ a {
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(circle at 50% 6%, rgba(255, 242, 213, 0.16), transparent 34%),
+    radial-gradient(circle at var(--tilt-glow-x) var(--tilt-glow-y), rgba(255, 242, 213, 0.26), transparent 34%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.26), transparent 28%, rgba(0, 0, 0, 0.5));
+  transition: background 180ms linear;
 }
 
 .slide-bg {
@@ -196,7 +210,7 @@ a {
   z-index: 0;
   background-position: center;
   background-size: cover;
-  transform: scale(1.03);
+  transform: translate3d(var(--tilt-bg-x), var(--tilt-bg-y), -28px) scale(1.08);
   transition: transform 1300ms var(--ease), opacity 900ms var(--ease);
 }
 
@@ -237,7 +251,7 @@ a {
 }
 
 .slide.is-active .slide__inner {
-  transform: translateZ(58px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform: translate3d(var(--tilt-layer-x), var(--tilt-layer-y), 58px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
 }
 
 .slide__inner--center {
@@ -553,7 +567,8 @@ h2 {
     0 26px 58px rgba(0, 0, 0, 0.36),
     0 0 0 10px rgba(255, 231, 183, 0.06);
   overflow: hidden;
-  transform: translateZ(48px);
+  transform: translate3d(var(--tilt-layer-x), var(--tilt-layer-y), 48px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 180ms linear;
 }
 
 .photo-panel::before {
@@ -615,7 +630,8 @@ h2 {
   box-shadow:
     0 24px 54px rgba(0, 0, 0, 0.36),
     0 0 0 10px rgba(255, 231, 183, 0.04);
-  transform: translateZ(54px);
+  transform: translate3d(var(--tilt-layer-x), var(--tilt-layer-y), 54px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 180ms linear;
 }
 
 .story-photo-frame::before {
@@ -645,14 +661,14 @@ h2 {
   object-fit: cover;
   object-position: var(--story-position, center center);
   filter: saturate(1.02) contrast(1.03);
-  transform: scale(1);
+  transform: translate3d(var(--tilt-photo-x), var(--tilt-photo-y), 0) scale(1.07);
   transition: opacity 260ms ease, transform 420ms var(--ease), filter 420ms ease;
 }
 
 .story-album.is-changing .story-photo-frame img {
   opacity: 0;
   filter: blur(8px) saturate(0.9);
-  transform: scale(1.03);
+  transform: translate3d(var(--tilt-photo-x), var(--tilt-photo-y), 0) scale(1.1);
 }
 
 .story-counter {
@@ -929,10 +945,10 @@ h2 {
 
 @keyframes cinematicZoom {
   from {
-    transform: scale(1.07);
+    transform: translate3d(var(--tilt-bg-x), var(--tilt-bg-y), -28px) scale(1.11);
   }
   to {
-    transform: scale(1.01);
+    transform: translate3d(var(--tilt-bg-x), var(--tilt-bg-y), -28px) scale(1.05);
   }
 }
 
@@ -951,14 +967,14 @@ h2 {
 @keyframes sparkFall {
   0% {
     opacity: 0;
-    transform: translate3d(0, -30px, 0) scale(0.8);
+    transform: translate3d(var(--tilt-spark-x), -30px, 0) scale(0.8);
   }
   12% {
     opacity: 0.9;
   }
   100% {
     opacity: 0;
-    transform: translate3d(42px, 112dvh, 0) scale(0.3);
+    transform: translate3d(calc(var(--tilt-spark-x) + 42px), 112dvh, 0) scale(0.3);
   }
 }
 
