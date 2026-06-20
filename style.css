@@ -913,8 +913,8 @@ h2 {
 
 .music-toggle {
   position: absolute;
-  left: 16px;
-  bottom: 18px;
+  top: calc(env(safe-area-inset-top, 0px) + 22px);
+  left: calc(env(safe-area-inset-left, 0px) + 22px);
   z-index: 7;
   display: grid;
   place-items: center;
@@ -932,24 +932,59 @@ h2 {
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   cursor: pointer;
   backdrop-filter: blur(16px);
-  transform: translateZ(120px);
   transition: border-color 240ms ease, box-shadow 240ms ease, transform 240ms ease;
 }
 
 .music-toggle span {
+  position: relative;
+  z-index: 1;
   font-size: 1.25rem;
   line-height: 1;
   transform: translateY(-1px);
 }
 
+.music-toggle::before,
 .music-toggle::after {
   position: absolute;
+  border-radius: inherit;
+  content: "";
+}
+
+.music-toggle::before {
+  inset: 5px;
+  background: conic-gradient(
+    from 90deg,
+    rgba(212, 170, 92, 0),
+    rgba(212, 170, 92, 0.92),
+    rgba(255, 244, 223, 0.86),
+    rgba(212, 170, 92, 0)
+  );
+  opacity: 0;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  pointer-events: none;
+  transform: rotate(0deg);
+}
+
+.music-toggle::after {
   inset: -5px;
   border: 1px solid rgba(212, 170, 92, 0.28);
-  border-radius: inherit;
   opacity: 0;
-  content: "";
+  pointer-events: none;
   transform: scale(0.82);
+}
+
+.music-toggle.is-loading {
+  border-color: rgba(212, 170, 92, 0.72);
+}
+
+.music-toggle.is-loading::before {
+  opacity: 1;
+  animation: musicSpin 820ms linear infinite;
+}
+
+.music-toggle.is-loading span {
+  color: rgba(255, 244, 223, 0.72);
 }
 
 .music-toggle.is-playing {
@@ -965,7 +1000,7 @@ h2 {
 }
 
 .music-toggle:active {
-  transform: translateZ(120px) scale(0.96);
+  transform: scale(0.96);
 }
 
 @keyframes sweepLight {
@@ -1047,6 +1082,12 @@ h2 {
   }
 }
 
+@keyframes musicSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (min-width: 540px) {
   .invite-shell {
     height: min(100dvh - 36px, 900px);
@@ -1055,6 +1096,13 @@ h2 {
 }
 
 @media (max-height: 720px) {
+  .music-toggle {
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    left: calc(env(safe-area-inset-left, 0px) + 16px);
+    width: 40px;
+    height: 40px;
+  }
+
   .slide__inner {
     padding: 30px 24px 50px;
   }

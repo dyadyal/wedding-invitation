@@ -621,15 +621,35 @@ function setupBackgroundMusic() {
 
   let userPaused = false;
   let isTryingToPlay = false;
+  const enoughDataState = 3;
+  let isMusicLoading = music.readyState < enoughDataState;
 
   music.volume = 0.42;
 
   function updateMusicButton() {
     const isPlaying = !music.paused && !music.muted;
+    const isLoading =
+      isTryingToPlay ||
+      isMusicLoading ||
+      (!music.error && !userPaused && music.readyState < enoughDataState);
 
     toggle.classList.toggle("is-playing", isPlaying);
+    toggle.classList.toggle("is-loading", isLoading);
     toggle.setAttribute("aria-pressed", String(isPlaying));
-    toggle.setAttribute("aria-label", isPlaying ? "Выключить музыку" : "Включить музыку");
+    toggle.setAttribute(
+      "aria-label",
+      isLoading
+        ? "Музыка загружается"
+        : isPlaying
+          ? "Выключить музыку"
+          : "Включить музыку",
+    );
+    toggle.setAttribute("aria-busy", String(isLoading));
+  }
+
+  function setMusicLoading(value) {
+    isMusicLoading = value;
+    updateMusicButton();
   }
 
   async function playMusic() {
@@ -638,6 +658,7 @@ function setupBackgroundMusic() {
     }
 
     isTryingToPlay = true;
+    setMusicLoading(music.readyState < enoughDataState);
     music.muted = false;
 
     try {
@@ -652,6 +673,7 @@ function setupBackgroundMusic() {
 
   function pauseMusic() {
     userPaused = true;
+    setMusicLoading(false);
     music.pause();
     updateMusicButton();
   }
@@ -672,6 +694,14 @@ function setupBackgroundMusic() {
     pauseMusic();
   });
 
+  music.addEventListener("loadstart", () => setMusicLoading(true));
+  music.addEventListener("loadeddata", () => setMusicLoading(false));
+  music.addEventListener("canplay", () => setMusicLoading(false));
+  music.addEventListener("canplaythrough", () => setMusicLoading(false));
+  music.addEventListener("waiting", () => setMusicLoading(true));
+  music.addEventListener("stalled", () => setMusicLoading(true));
+  music.addEventListener("playing", () => setMusicLoading(false));
+  music.addEventListener("error", () => setMusicLoading(false));
   music.addEventListener("play", updateMusicButton);
   music.addEventListener("pause", updateMusicButton);
   music.addEventListener("volumechange", updateMusicButton);
