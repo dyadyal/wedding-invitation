@@ -626,6 +626,9 @@ function setupBackgroundMusic() {
   const enoughDataState = 3;
   let isMusicLoading = music.readyState < enoughDataState;
 
+  music.autoplay = true;
+  music.loop = true;
+  music.preload = "auto";
   music.volume = 0.42;
 
   function updateMusicButton() {
@@ -684,6 +687,12 @@ function setupBackgroundMusic() {
     playMusic();
   }
 
+  function requestAutoplay() {
+    if (!userPaused) {
+      playMusic();
+    }
+  }
+
   toggle.addEventListener("click", (event) => {
     event.stopPropagation();
 
@@ -697,9 +706,18 @@ function setupBackgroundMusic() {
   });
 
   music.addEventListener("loadstart", () => setMusicLoading(true));
-  music.addEventListener("loadeddata", () => setMusicLoading(false));
-  music.addEventListener("canplay", () => setMusicLoading(false));
-  music.addEventListener("canplaythrough", () => setMusicLoading(false));
+  music.addEventListener("loadeddata", () => {
+    setMusicLoading(false);
+    requestAutoplay();
+  });
+  music.addEventListener("canplay", () => {
+    setMusicLoading(false);
+    requestAutoplay();
+  });
+  music.addEventListener("canplaythrough", () => {
+    setMusicLoading(false);
+    requestAutoplay();
+  });
   music.addEventListener("waiting", () => setMusicLoading(true));
   music.addEventListener("stalled", () => setMusicLoading(true));
   music.addEventListener("playing", () => setMusicLoading(false));
@@ -709,8 +727,21 @@ function setupBackgroundMusic() {
   music.addEventListener("volumechange", updateMusicButton);
   document.addEventListener("click", unlockMusic, { capture: true, once: true });
   document.addEventListener("touchend", unlockMusic, { capture: true, once: true, passive: true });
+  window.addEventListener("load", requestAutoplay, { once: true });
+  window.addEventListener("pageshow", requestAutoplay);
+  window.addEventListener("focus", requestAutoplay);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      requestAutoplay();
+    }
+  });
 
-  window.setTimeout(playMusic, 250);
+  music.load();
+  requestAutoplay();
+  window.requestAnimationFrame(requestAutoplay);
+  [120, 500, 1200, 2400].forEach((delay) => {
+    window.setTimeout(requestAutoplay, delay);
+  });
   updateMusicButton();
 }
 
