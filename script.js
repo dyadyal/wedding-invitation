@@ -292,6 +292,7 @@ let storyIndex = 0;
 
 function setupStory() {
   const storyAlbum = document.querySelector(".story-album");
+  const storyPhotoFrame = document.querySelector(".story-photo-frame");
   const storyImage = document.getElementById("storyImage");
   const storyKicker = document.getElementById("storyKicker");
   const storyCounter = document.getElementById("storyCounter");
@@ -315,6 +316,7 @@ function setupStory() {
     if (!withMotion) {
       storyImage.src = step.image;
       storyImage.alt = step.alt;
+      storyPhotoFrame.style.setProperty("--story-image", `url("${step.image}")`);
       storyKicker.textContent = step.title;
       storyText.textContent = step.text;
       storyCounter.textContent = `${padNumber(storyIndex + 1)} / ${storySteps.length}`;
@@ -330,6 +332,7 @@ function setupStory() {
     window.setTimeout(() => {
       storyImage.src = step.image;
       storyImage.alt = step.alt;
+      storyPhotoFrame.style.setProperty("--story-image", `url("${step.image}")`);
       storyKicker.textContent = step.title;
       storyText.textContent = step.text;
       storyCounter.textContent = `${padNumber(storyIndex + 1)} / ${storySteps.length}`;
