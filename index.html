@@ -11,7 +11,19 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="invite-shell" id="inviteApp" aria-label="Свадебное приглашение Алексея и Лияны">
+    <main class="invite-shell is-loading" id="inviteApp" aria-label="Свадебное приглашение Алексея и Лияны">
+      <div class="preloader" id="preloader" role="status" aria-live="polite" aria-label="Загрузка приглашения">
+        <div class="preloader__content">
+          <div class="preloader__mark" aria-hidden="true"></div>
+          <p class="preloader__eyebrow">Алексей &amp; Лияна</p>
+          <p class="preloader__title">Загружаем<br />приглашение</p>
+          <div class="preloader__line" aria-hidden="true">
+            <span id="preloaderBar"></span>
+          </div>
+          <p class="preloader__percent" id="preloaderPercent">0%</p>
+        </div>
+      </div>
+
       <div class="slides" id="slides">
         <section class="slide slide--hero is-active" aria-label="Главный экран">
           <div class="slide-bg slide-bg--couple-main"></div>

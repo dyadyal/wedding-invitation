@@ -9,6 +9,141 @@ let isLocked = false;
 let touchStartY = 0;
 let touchStartX = 0;
 
+function setupPreloader() {
+  const preloader = document.getElementById("preloader");
+  const preloaderBar = document.getElementById("preloaderBar");
+  const preloaderPercent = document.getElementById("preloaderPercent");
+
+  if (!preloader || !preloaderBar || !preloaderPercent) {
+    app.classList.remove("is-loading");
+    return;
+  }
+
+  const startedAt = Date.now();
+  const minVisibleTime = 1100;
+  const maxVisibleTime = 4200;
+  const imageSources = Array.from(
+    new Set([
+      "images/story-21.jpg",
+      "images/zags-facade.jpg",
+      "images/couple-second.jpg",
+      ...storySteps.map((step) => step.image),
+    ]),
+  );
+  const assets = [...imageSources.map(loadImageAsset), waitForMusicAsset()];
+  const totalAssets = Math.max(assets.length, 1);
+  let loadedAssets = 0;
+  let isDone = false;
+
+  function updateProgress() {
+    const percent = Math.min(100, Math.round((loadedAssets / totalAssets) * 100));
+    preloaderBar.style.width = `${percent}%`;
+    preloaderPercent.textContent = `${percent}%`;
+  }
+
+  function finishPreloader() {
+    if (isDone) {
+      return;
+    }
+
+    isDone = true;
+    loadedAssets = totalAssets;
+    updateProgress();
+
+    const visibleFor = Date.now() - startedAt;
+    const delay = Math.max(0, minVisibleTime - visibleFor);
+
+    window.setTimeout(() => {
+      preloader.classList.add("is-hidden");
+      preloader.setAttribute("aria-hidden", "true");
+      app.classList.remove("is-loading");
+
+      window.setTimeout(() => {
+        preloader.remove();
+      }, 760);
+    }, delay);
+  }
+
+  function markLoaded() {
+    if (isDone) {
+      return;
+    }
+
+    loadedAssets += 1;
+    updateProgress();
+
+    if (loadedAssets >= totalAssets) {
+      finishPreloader();
+    }
+  }
+
+  assets.forEach((asset) => {
+    asset.finally(markLoaded);
+  });
+
+  window.setTimeout(finishPreloader, maxVisibleTime);
+  updateProgress();
+}
+
+function loadImageAsset(src) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    let isResolved = false;
+
+    function finish() {
+      if (isResolved) {
+        return;
+      }
+
+      isResolved = true;
+      resolve();
+    }
+
+    image.onload = finish;
+    image.onerror = finish;
+    image.src = src;
+
+    if (image.complete) {
+      finish();
+    }
+
+    window.setTimeout(finish, 3500);
+  });
+}
+
+function waitForMusicAsset() {
+  return new Promise((resolve) => {
+    const music = document.getElementById("bgMusic");
+    let isResolved = false;
+
+    function finish() {
+      if (isResolved) {
+        return;
+      }
+
+      isResolved = true;
+      resolve();
+    }
+
+    if (!music || music.readyState >= 2) {
+      finish();
+      return;
+    }
+
+    music.addEventListener("loadeddata", finish, { once: true });
+    music.addEventListener("canplaythrough", finish, { once: true });
+    music.addEventListener("error", finish, { once: true });
+
+    try {
+      music.load();
+    } catch (error) {
+      finish();
+    }
+
+    window.setTimeout(finish, 2400);
+  });
+}
+
 function createDots() {
   slides.forEach((slide, index) => {
     const dot = document.createElement("button");
@@ -824,6 +959,7 @@ function setupBackgroundMusic() {
   updateMusicButton();
 }
 
+setupPreloader();
 createDots();
 setupSliderControls();
 setupPerspectiveTilt();
