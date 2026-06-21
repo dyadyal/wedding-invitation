@@ -8,6 +8,7 @@ let currentSlide = 0;
 let isLocked = false;
 let touchStartY = 0;
 let touchStartX = 0;
+const slideTransitionDuration = 920;
 
 function setupPreloader() {
   const preloader = document.getElementById("preloader");
@@ -180,15 +181,15 @@ function goToSlide(index) {
 
   const directionClass = nextIndex > currentSlide ? "is-turning-down" : "is-turning-up";
   app.classList.remove("is-turning-down", "is-turning-up");
-  app.classList.add("is-turning", directionClass);
+  app.classList.add("is-turning", "is-tilt-paused", directionClass);
   currentSlide = nextIndex;
   updateSlideState();
 
   isLocked = true;
   window.setTimeout(() => {
     isLocked = false;
-    app.classList.remove("is-turning", "is-turning-down", "is-turning-up");
-  }, 1050);
+    app.classList.remove("is-turning", "is-tilt-paused", "is-turning-down", "is-turning-up");
+  }, slideTransitionDuration);
 }
 
 function goNext() {
@@ -334,6 +335,10 @@ function setupPerspectiveTilt() {
   }
 
   function setTilt(x, y) {
+    if (isLocked || app.classList.contains("is-turning")) {
+      return;
+    }
+
     targetTilt.x = clamp(x, -1, 1);
     targetTilt.y = clamp(y, -1, 1);
 
