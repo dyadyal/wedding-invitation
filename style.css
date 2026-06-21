@@ -621,7 +621,14 @@ h2 {
   gap: 12px;
   width: min(100%, 334px);
   margin: 24px 0 18px;
+  cursor: grab;
   perspective: 900px;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.story-album.is-dragging {
+  cursor: grabbing;
 }
 
 .story-photo-frame {

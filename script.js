@@ -464,6 +464,11 @@ function setupStory() {
   const storyButton = document.getElementById("storyButton");
   const storyContinueButton = document.getElementById("storyContinueButton");
   const storyProgress = document.getElementById("storyProgress");
+  let storyDragStartX = 0;
+  let storyDragStartY = 0;
+  let isStoryDragging = false;
+
+  storyImage.draggable = false;
 
   storySteps.forEach((step, index) => {
     const preload = new Image();
@@ -520,12 +525,91 @@ function setupStory() {
     });
   }
 
-  storyButton.addEventListener("click", () => {
-    storyIndex = (storyIndex + 1) % storySteps.length;
+  function goToStoryStep(direction) {
+    if (storyAlbum.classList.contains("is-changing")) {
+      return;
+    }
+
+    storyIndex = (storyIndex + direction + storySteps.length) % storySteps.length;
     renderStoryStep();
+  }
+
+  function handleStorySwipe(deltaX, deltaY) {
+    const swipeThreshold = 44;
+
+    if (Math.abs(deltaX) < swipeThreshold || Math.abs(deltaX) < Math.abs(deltaY) * 1.15) {
+      return false;
+    }
+
+    goToStoryStep(deltaX < 0 ? 1 : -1);
+    return true;
+  }
+
+  storyAlbum.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    storyDragStartX = event.clientX;
+    storyDragStartY = event.clientY;
+    isStoryDragging = true;
+    storyAlbum.classList.add("is-dragging");
+
+    try {
+      storyAlbum.setPointerCapture(event.pointerId);
+    } catch (error) {
+      // Pointer capture is optional; swiping still works without it.
+    }
+  });
+
+  storyAlbum.addEventListener("pointerup", (event) => {
+    if (!isStoryDragging) {
+      return;
+    }
+
+    const deltaX = event.clientX - storyDragStartX;
+    const deltaY = event.clientY - storyDragStartY;
+    isStoryDragging = false;
+    storyAlbum.classList.remove("is-dragging");
+
+    if (handleStorySwipe(deltaX, deltaY)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    try {
+      storyAlbum.releasePointerCapture(event.pointerId);
+    } catch (error) {
+      // The pointer may already be released by the browser.
+    }
+  });
+
+  storyAlbum.addEventListener("pointercancel", () => {
+    isStoryDragging = false;
+    storyAlbum.classList.remove("is-dragging");
+  });
+
+  storyButton.addEventListener("click", () => {
+    goToStoryStep(1);
   });
 
   storyContinueButton.addEventListener("click", goNext);
+
+  window.addEventListener("keydown", (event) => {
+    if (!slides[currentSlide]?.classList.contains("slide--story")) {
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goToStoryStep(1);
+    }
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goToStoryStep(-1);
+    }
+  });
 
   renderStoryStep(false);
 }
