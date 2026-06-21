@@ -279,7 +279,6 @@ a {
 .story-album,
 .story-box,
 .details-list,
-.rsvp-form,
 .photo-panel,
 .story-actions,
 .calendar-button,
@@ -298,7 +297,6 @@ a {
 .slide.is-active .story-album,
 .slide.is-active .story-box,
 .slide.is-active .details-list,
-.slide.is-active .rsvp-form,
 .slide.is-active .photo-panel,
 .slide.is-active .story-actions,
 .slide.is-active .calendar-button,
@@ -322,7 +320,6 @@ a {
 .slide.is-active .story-album,
 .slide.is-active .story-box,
 .slide.is-active .details-list,
-.slide.is-active .rsvp-form,
 .slide.is-active .text {
   animation-delay: 230ms;
 }
@@ -788,115 +785,6 @@ h2 {
   line-height: 1.16;
 }
 
-.rsvp-form {
-  display: grid;
-  gap: 14px;
-  width: 100%;
-  margin-top: 24px;
-}
-
-.field {
-  display: grid;
-  gap: 7px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.field > span,
-.radio-field legend {
-  color: var(--gold);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.field input,
-.field textarea {
-  width: 100%;
-  border: 1px solid rgba(255, 231, 183, 0.18);
-  border-radius: 0;
-  outline: none;
-  background: rgba(255, 244, 223, 0.08);
-  color: var(--cream);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 1rem;
-  transition: border 180ms ease, background 180ms ease;
-}
-
-.field input {
-  height: 46px;
-  padding: 0 14px;
-}
-
-.field textarea {
-  min-height: 82px;
-  resize: none;
-  padding: 12px 14px;
-}
-
-.field input:focus,
-.field textarea:focus {
-  border-color: rgba(212, 170, 92, 0.72);
-  background: rgba(255, 244, 223, 0.13);
-  box-shadow: 0 0 0 3px rgba(212, 170, 92, 0.12);
-}
-
-.radio-field {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.radio-field legend {
-  grid-column: 1 / -1;
-}
-
-.radio-field label {
-  display: grid;
-  place-items: center;
-  min-height: 46px;
-  padding: 8px 6px;
-  border: 1px solid rgba(255, 231, 183, 0.18);
-  background: rgba(255, 244, 223, 0.06);
-  cursor: pointer;
-  text-align: center;
-  transition: border 180ms ease, background 180ms ease, box-shadow 180ms ease;
-}
-
-.radio-field input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.radio-field label span {
-  color: var(--cream);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.76rem;
-  font-weight: 700;
-  line-height: 1.12;
-}
-
-.radio-field label:has(input:checked) {
-  border-color: rgba(212, 170, 92, 0.82);
-  background: linear-gradient(135deg, rgba(95, 35, 48, 0.78), rgba(212, 170, 92, 0.24));
-  box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-.form-message {
-  min-height: 20px;
-  margin: 0;
-  color: var(--gold);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.84rem;
-  font-weight: 700;
-  text-align: center;
-}
-
 .slide-dots {
   position: absolute;
   top: 50%;
@@ -1195,18 +1083,6 @@ h2 {
     padding: 12px 15px;
   }
 
-  .rsvp-form {
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .field input {
-    height: 42px;
-  }
-
-  .field textarea {
-    min-height: 66px;
-  }
 }
 
 @media (max-width: 340px) {

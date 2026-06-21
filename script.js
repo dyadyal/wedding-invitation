@@ -542,7 +542,7 @@ function setupCalendarButton() {
     const eventLocation =
       "Городской дворец бракосочетания, ул. Советская, 47, Тула, Тульская обл.";
     const eventDescription =
-      "Свадебная роспись Алексея и Лияны. Будущая семья Кульпины.";
+      "Свадебная роспись Алексея и Лияны. Будущая семья Кульпиных.";
     const calendarContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -583,36 +583,6 @@ function escapeCalendarText(value) {
     .replace(/;/g, "\\;");
 }
 
-function setupRsvpForm() {
-  const form = document.getElementById("rsvpForm");
-  const message = document.getElementById("formMessage");
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-    const payload = {
-      guestName: formData.get("guestName"),
-      attendance: formData.get("attendance"),
-      comment: formData.get("comment"),
-      submittedAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem("wedding-rsvp", JSON.stringify(payload));
-    await sendGuestReply(payload);
-
-    message.textContent = "Спасибо! Ваш ответ сохранён.";
-    form.reset();
-    form.querySelector('input[name="attendance"][value="Приду"]').checked = true;
-  });
-}
-
-async function sendGuestReply(payload) {
-  // Здесь позже можно подключить Telegram-бота, Google Таблицу или Битрикс24.
-  // Например: return fetch("ВАШ_WEBHOOK_URL", { method: "POST", body: JSON.stringify(payload) });
-  return payload;
-}
-
 function setupBackgroundMusic() {
   const music = document.getElementById("bgMusic");
   const toggle = document.getElementById("musicToggle");
@@ -624,12 +594,27 @@ function setupBackgroundMusic() {
   let userPaused = false;
   let isTryingToPlay = false;
   const enoughDataState = 3;
+  const musicStartOffset = 5;
   let isMusicLoading = music.readyState < enoughDataState;
 
   music.autoplay = true;
-  music.loop = true;
+  music.loop = false;
   music.preload = "auto";
   music.volume = 0.42;
+
+  function seekPastIntro() {
+    if (!Number.isFinite(music.duration) || music.duration <= musicStartOffset + 1) {
+      return;
+    }
+
+    if (music.currentTime < musicStartOffset || music.ended) {
+      try {
+        music.currentTime = musicStartOffset;
+      } catch (error) {
+        window.setTimeout(seekPastIntro, 250);
+      }
+    }
+  }
 
   function updateMusicButton() {
     const isPlaying = !music.paused && !music.muted;
@@ -667,6 +652,7 @@ function setupBackgroundMusic() {
     music.muted = false;
 
     try {
+      seekPastIntro();
       await music.play();
     } catch (error) {
       updateMusicButton();
@@ -706,12 +692,15 @@ function setupBackgroundMusic() {
   });
 
   music.addEventListener("loadstart", () => setMusicLoading(true));
+  music.addEventListener("loadedmetadata", seekPastIntro);
   music.addEventListener("loadeddata", () => {
     setMusicLoading(false);
+    seekPastIntro();
     requestAutoplay();
   });
   music.addEventListener("canplay", () => {
     setMusicLoading(false);
+    seekPastIntro();
     requestAutoplay();
   });
   music.addEventListener("canplaythrough", () => {
@@ -725,6 +714,12 @@ function setupBackgroundMusic() {
   music.addEventListener("play", updateMusicButton);
   music.addEventListener("pause", updateMusicButton);
   music.addEventListener("volumechange", updateMusicButton);
+  music.addEventListener("ended", () => {
+    if (!userPaused) {
+      seekPastIntro();
+      playMusic();
+    }
+  });
   document.addEventListener("click", unlockMusic, { capture: true, once: true });
   document.addEventListener("touchend", unlockMusic, { capture: true, once: true, passive: true });
   window.addEventListener("load", requestAutoplay, { once: true });
@@ -750,7 +745,6 @@ setupSliderControls();
 setupPerspectiveTilt();
 setupStory();
 setupCalendarButton();
-setupRsvpForm();
 setupBackgroundMusic();
 updateSlideState();
 updateCountdown();
